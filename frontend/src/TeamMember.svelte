@@ -1,14 +1,19 @@
 <script lang="ts">
     import MdClose from 'svelte-icons/md/MdClose.svelte'
+    import MdWarning from 'svelte-icons/md/MdWarning.svelte'
 
-    let name: string;
-    let year: number = 11;
-    let mg: number = 0;
-    let discord: string;
-    let ign: string;
+    export let name: string;
+    export let year: number;
+    export let mg: number;
+    export let discord: string;
+    export let ign: string;
+    export let sub: boolean;
 
-    let error: string | null = null;
+    import { createEventDispatcher } from 'svelte';
+    const dispatch = createEventDispatcher();
 
+    let error: string | null = validate();
+    
     function validate() {
         if (!(/^[a-zA-Z]+ [a-zA-Z]+$/i.test(name))) {
             return "Full Name Required"
@@ -27,7 +32,7 @@
         }
 
         if (ign.length == 0) {
-            return "Please enter your in-game name"
+            return "Please Enter IGN"
         }
 
         return null;
@@ -35,12 +40,19 @@
 
     function onChange() {
         error = validate()
+        dispatch('change',
+            { name, year, mg, discord, ign, sub, valid: (error === null) }
+        );
+    }
+
+    function onRemove() {
+        dispatch('remove')
     }
 </script>
 
 
 <div class="adder">
-    <div class="close">
+    <div class="close" on:click={onRemove}>
         <MdClose />
     </div>
     <label for="name">Real Name</label>
@@ -68,10 +80,16 @@
     <label for="ign">In Game Username</label>
     <input type="text" name="ign" placeholder="eg. Codian" bind:value={ign} on:change={onChange}>
 
-    {#if error != null}
+    <span class="oneline">
+        <label for="sub">Is Subsititute Player</label>
+        <span class="spring" />
+        <input type="checkbox" name="sub" placeholder="Substitute" bind:checked={sub} on:change={onChange}>
+    </span>
+
+    {#if error !== null}
         <div class="error">
             <span class="error-icon">
-                <MdClose />
+                <MdWarning />
             </span>
             <span>
                 {error}
@@ -88,17 +106,6 @@
         background-color: #333;
         border-radius: 0.5em;
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-    }
-
-    label {
-        font-weight: bold;
-        padding-block: 0.5em;
-        min-width: max-content;
-    }
-
-    input {
-        width: 100%;
-        flex-grow: 1;
     }
 
     .mg_container {
@@ -129,16 +136,19 @@
     .close:hover {
         color: orangered;
     }
-
-    .error {
-        color: orange;
-        height: min-content;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    
+    input:not([type='checkbox']) {
+        width: 100%;
+        flex-grow: 1;
     }
 
-    .error-icon {
-        height: 32px;
+
+    .oneline {
+        display: flex;
+        align-items: center;
+    }
+    
+    .spring {
+        flex-grow: 1;
     }
 </style>
