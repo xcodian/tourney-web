@@ -55,6 +55,7 @@
     <div class="close" on:click={onRemove}>
         <MdClose />
     </div>
+    <div class="faint">Player Details</div>
     <label for="name">Real Name</label>
     <input type="text" name="name" placeholder="eg. Martin Velikov" bind:value={name} on:change={onChange}>
 
@@ -128,8 +129,8 @@
     .close {
         position: absolute;
         width: 1em;
-        right: 0.5em;
-        top: 0.5em;
+        right: 1em;
+        top: 1.15em;
         cursor: pointer;
     }
 
@@ -150,5 +151,9 @@
     
     .spring {
         flex-grow: 1;
+    }
+
+    .faint {
+        color: gray;
     }
 </style>

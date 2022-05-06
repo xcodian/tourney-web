@@ -25,7 +25,7 @@
         
         box-sizing: border-box;
         padding: 1em;
-        margin: 1em;
+        margin-inline: 1em;
         
         box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
     }

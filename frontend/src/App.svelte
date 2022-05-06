@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TeamMember from "./TeamMember.svelte";
 	import AddMemberButton from "./AddMemberButton.svelte";
+	import Countdown from "./Countdown.svelte";
 
 	import MdWarning from 'svelte-icons/md/MdWarning.svelte'
 
@@ -18,6 +19,7 @@
 	let submitted = false;
 	let error: string | null = "initial";
 	let allowTryAgain = false;
+	let expired = false;
 
 	$: non_subs = members.filter(x => !x.sub);
 	$: members, name, error = validateWholeTeam();
@@ -104,68 +106,76 @@
 	<br>
 	<img src="GamingPlusLogo.svg" height="128" alt="GIHS Gaming+ Logo">
 	<h1>GIHS Gaming+ Tournament Sign Up</h1>
-	
-	{#if submitted}
-		<br><br>
-		<h2 class="green">Your team has been registered.</h2>
-		<p>You may now close this tab. Good luck to {name} in the tournament!</p>
-	{:else}
-		<p>Please enter your team's details below.</p>
-	{/if}
 
-	
-	{#if error == null && !submitted}
-		<br><br>
-		<h1 class="green">You're all set!</h1>
-		<p class="green">Please note that submitting is irreversible.</p>
-		<p class="green">You can't edit your team's data later.</p>
-		<br>
-		<button class="submit" on:click={submit}>
-			Submit
-		</button>
-	{/if}
-
-	{#if !submitting && !submitted}
-		<br><br>
-		<label for="teamname">Team Name</label>
-		<input type="text" name="teamname" placeholder="eg. Red Team" bind:value={name} on:change={validateWholeTeam}>
-
-		<br>
-		{#if error != null}
-			<div class="error" transition:fade>
-				<span class="error-icon">
-					<MdWarning />
-				</span>
-				<span>
-					{error}
-				</span>
-
-				{#if allowTryAgain}
-					<!-- svelte-ignore a11y-missing-attribute -->
-					<a on:click={submit} style="padding-left: 10px;">Try Again</a>
-				{/if}
-			</div>
+	{#if !expired}
+		{#if submitted}
+			<br><br>
+			<h2 class="green">Your team has been registered.</h2>
+			<p>You may now close this tab. Good luck to {name} in the tournament!</p>
+		{:else}
+			<p>Please enter your team's details below.</p>
+			<br>
+			<Countdown bind:expired={expired} />
 		{/if}
 
-		<br><br>
-		<h2>Your Players {(non_subs.length != members.length) ? `(${members.length - non_subs.length} subs)` : ""}</h2>
-		<div class="roster">
-			{#each members as member}
-				<div class="flex">
-					<TeamMember
-						name={member.name}
-						discord={member.discord}
-						ign={member.ign} 
-						mg={member.mg}
-						year={member.year}
-						sub={member.sub}
-						on:change={({ detail }) => member = detail}
-						on:remove={() => removeMember(member)}
-					/>
+		
+		{#if error == null && !submitted}
+			<br><br>
+			<h1 class="green">You're all set!</h1>
+			<p class="green">Please note that submitting is irreversible.</p>
+			<p class="green">You can't edit your team's data later.</p>
+			<br>
+			<button class="submit" on:click={submit}>
+				Submit
+			</button>
+		{/if}
+
+		{#if !submitting && !submitted}
+			<br><br>
+			<h2>Your Team Name</h2>
+			<input type="text" name="teamname" placeholder="eg. Red Team" bind:value={name} on:change={validateWholeTeam}>
+
+			<br>
+			{#if error != null}
+				<div class="error" transition:fade>
+					<span class="error-icon">
+						<MdWarning />
+					</span>
+					<span>
+						{error}
+					</span>
+
+					{#if allowTryAgain}
+						<!-- svelte-ignore a11y-missing-attribute -->
+						<a on:click={submit} style="padding-left: 10px;">Try Again</a>
+					{/if}
 				</div>
-			{/each}
-			<AddMemberButton on:click={addNewMember} />
-		</div>	
+			{/if}
+
+			<br>
+			<h2>Your Players {(non_subs.length != members.length) ? `(${members.length - non_subs.length} subs)` : ""}</h2>
+			<div class="roster">
+				{#each members as member}
+					<div class="flex">
+						<TeamMember
+							name={member.name}
+							discord={member.discord}
+							ign={member.ign} 
+							mg={member.mg}
+							year={member.year}
+							sub={member.sub}
+							on:change={({ detail }) => member = detail}
+							on:remove={() => removeMember(member)}
+						/>
+					</div>
+				{/each}
+				<AddMemberButton on:click={addNewMember} />
+			</div>	
+		{/if}
+	{:else}
+		<br><br>
+		<h2 class="red">Sign-ups for the tournament have ended!</h2>
+		<p>All playing teams have been registered and finalized.</p>
 	{/if}
 </main>
 
@@ -184,10 +194,14 @@
 		align-items: center;
 		gap: 1em;
 		flex-wrap: wrap;
-		padding: 1em;
+		padding: 0.5em;
 	}
 
 	.green {
 		color: lightgreen;
+	}
+
+	.red {
+		color: lightcoral;
 	}
 </style>
