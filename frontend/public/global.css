@@ -18,16 +18,9 @@ h1, h2, h3, p {
 }
 
 a {
-	color: rgb(0,100,200);
-	text-decoration: none;
-}
-
-a:hover {
+	all: unset;
 	text-decoration: underline;
-}
-
-a:visited {
-	color: rgb(0,80,160);
+	cursor: pointer;
 }
 
 label {

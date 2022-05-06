@@ -12,12 +12,15 @@
 	const MIN_NONSUBS = 5;
 	let members = [];
 	let non_subs = [];
-	let team_name = ""
+	let name = ""
 
+	let submitting = false;
+	let submitted = false;
 	let error: string | null = "initial";
+	let allowTryAgain = false;
 
 	$: non_subs = members.filter(x => !x.sub);
-	$: members, team_name, error = validateWholeTeam();
+	$: members, name, error = validateWholeTeam();
 
 	function addNewMember() {
 		members.push({
@@ -27,7 +30,7 @@
 			mg: 0,
 			year: 11,
 			sub: non_subs.length >= MAX_NONSUBS,
-			valid: false,
+			valid: false
 		})
 
 		members = members;
@@ -38,7 +41,9 @@
 	}
 
 	function validateWholeTeam() {
-		if (!(/^[a-z0-9 ]+$/i.test(team_name))) {
+		allowTryAgain = false;
+
+		if (!(/^[a-z0-9 ]+$/i.test(name))) {
 			return "Your team name is invalid."
 		}
 
@@ -57,8 +62,41 @@
 		return null;
 	}
 
-	function submit() {
-		
+	async function submit() {
+		submitting = true;
+		try {
+			const response = await fetch('/api/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ name, members })
+			});
+
+			switch(response.status) {
+				case 409:
+					error = "This team name has already been registered."
+					break;
+				case 400:
+					error = "Invalid data submitted."
+					break;
+				case 500:
+					error = "Server error while submitting, please try again later. Report this error to admins."
+					allowTryAgain = true;
+					break;
+				default:
+					error = "Unknown error while submitting: " + response.status + " " + response.statusText;
+					allowTryAgain = true;
+					break;
+				case 200:
+					submitted = true;
+					break;
+			}
+		} catch (e) {
+			console.error(e);
+		} finally {
+			submitting = false;
+		}
 	}
 </script>
 
@@ -66,54 +104,69 @@
 	<br>
 	<img src="GamingPlusLogo.svg" height="128" alt="GIHS Gaming+ Logo">
 	<h1>GIHS Gaming+ Tournament Sign Up</h1>
-	<p>Please enter your team's details below.</p>
-
-	{#if error == null}
+	
+	{#if submitted}
 		<br><br>
-		<h1>You're all set!</h1>
-		<p>Please note that submitting is irreversible.</p>
-		<p>You can't edit your team's data later.</p>
+		<h2 class="green">Your team has been registered.</h2>
+		<p>You may now close this tab. Good luck to {name} in the tournament!</p>
+	{:else}
+		<p>Please enter your team's details below.</p>
+	{/if}
+
+	
+	{#if error == null && !submitted}
+		<br><br>
+		<h1 class="green">You're all set!</h1>
+		<p class="green">Please note that submitting is irreversible.</p>
+		<p class="green">You can't edit your team's data later.</p>
 		<br>
 		<button class="submit" on:click={submit}>
 			Submit
 		</button>
 	{/if}
 
-	<br><br>
-	<label for="teamname">Team Name</label>
-    <input type="text" name="teamname" placeholder="eg. Red Team" bind:value={team_name} on:change={validateWholeTeam}>
+	{#if !submitting && !submitted}
+		<br><br>
+		<label for="teamname">Team Name</label>
+		<input type="text" name="teamname" placeholder="eg. Red Team" bind:value={name} on:change={validateWholeTeam}>
 
-	<br>
-	{#if error != null}
-		<div class="error" transition:fade>
-			<span class="error-icon">
-				<MdWarning />
-			</span>
-			<span>
-				{error}
-			</span>
-		</div>
-	{/if}
+		<br>
+		{#if error != null}
+			<div class="error" transition:fade>
+				<span class="error-icon">
+					<MdWarning />
+				</span>
+				<span>
+					{error}
+				</span>
 
-	<br><br>
-	<h2>Your Players {(non_subs.length != members.length) ? `(${members.length - non_subs.length} subs)` : ""}</h2>
-	<div class="roster">
-		{#each members as member}
-			<div class="flex">
-				<TeamMember
-					name={member.name}
-					discord={member.discord}
-					ign={member.ign} 
-					mg={member.mg}
-					year={member.year}
-					sub={member.sub}
-					on:change={({ detail }) => member = detail}
-					on:remove={() => removeMember(member)}
-				/>
+				{#if allowTryAgain}
+					<!-- svelte-ignore a11y-missing-attribute -->
+					<a on:click={submit} style="padding-left: 10px;">Try Again</a>
+				{/if}
 			</div>
-		{/each}
-		<AddMemberButton on:click={addNewMember} />
-	</div>
+		{/if}
+
+		<br><br>
+		<h2>Your Players {(non_subs.length != members.length) ? `(${members.length - non_subs.length} subs)` : ""}</h2>
+		<div class="roster">
+			{#each members as member}
+				<div class="flex">
+					<TeamMember
+						name={member.name}
+						discord={member.discord}
+						ign={member.ign} 
+						mg={member.mg}
+						year={member.year}
+						sub={member.sub}
+						on:change={({ detail }) => member = detail}
+						on:remove={() => removeMember(member)}
+					/>
+				</div>
+			{/each}
+			<AddMemberButton on:click={addNewMember} />
+		</div>	
+	{/if}
 </main>
 
 <style>
@@ -132,5 +185,9 @@
 		gap: 1em;
 		flex-wrap: wrap;
 		padding: 1em;
+	}
+
+	.green {
+		color: lightgreen;
 	}
 </style>
