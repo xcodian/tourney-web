@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import json
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -62,8 +63,20 @@ async def register(t: Team):
     
     teams[t.name] = t.members
 
-if __name__ == '__main__':
+async def save_data_occasionally():
+     while True:
+         print('[every 30s] writing team data to disk...')
+         with open('teams.json', 'w+') as f:
+            json.dump(teams, f)
+         await asyncio.sleep(30)
+
+async def main():
+    asyncio.create_task(save_data_occasionally())
+    
     config = Config()
     config.bind = ["0.0.0.0:9000"]
-
-    asyncio.run(serve(app, config))
+    
+    await serve(app, config)
+    
+if __name__ == '__main__':
+    asyncio.run(main())
