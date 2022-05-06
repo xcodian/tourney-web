@@ -24,11 +24,7 @@ class Member(BaseModel):
 class Team(BaseModel):
     name: str
     members: list[Member]
-
-@app.get("/")
-async def hello():
-    print("hello!")
-
+    
 @app.post("/register")
 async def register(t: Team):
     print(datetime.utcnow().timestamp())
