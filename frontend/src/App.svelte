@@ -45,7 +45,9 @@
 	function validateWholeTeam() {
 		allowTryAgain = false;
 
-		if (!(/^[a-z0-9 ]+$/i.test(name))) {
+		if (name.length === 0) {
+			return "Get started by picking a team name!"
+		} else if (!(/^[a-z0-9 ]+$/i.test(name))) {
 			return "Your team name is invalid."
 		}
 
@@ -121,12 +123,12 @@
 		
 		{#if error == null && !submitted}
 			<br><br>
-			<h1 class="green">You're all set!</h1>
+			<h1 class="green">Ready to go?</h1>
 			<p class="green">Please note that submitting is irreversible.</p>
 			<p class="green">You can't edit your team's data later.</p>
 			<br>
 			<button class="submit" on:click={submit}>
-				Submit
+				Sign My Team Up!
 			</button>
 		{/if}
 

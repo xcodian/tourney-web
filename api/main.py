@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -29,7 +30,9 @@ async def hello():
 
 @app.post("/register")
 async def register(t: Team):
-    print("hello!", t.dict())
+    print(datetime.utcnow().timestamp())
+    if datetime.utcnow().timestamp() > 1652409000:
+        raise HTTPException(status_code=400)
 
     t.name = t.name.strip()
 
