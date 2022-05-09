@@ -32,6 +32,7 @@
 			mg: 0,
 			year: 11,
 			sub: non_subs.length >= MAX_NONSUBS,
+			leader: false,
 			valid: false
 		})
 
@@ -61,6 +62,10 @@
 
 		if (members.some(x => !x.valid)) {
 			return `Some team member data seems to be incomplete or invalid.`;
+		}
+
+		if (members.filter(x => x.leader).length != 1) {
+			return `There needs to be exactly one team leader.`;
 		}
 
 		return null;
@@ -166,6 +171,7 @@
 							mg={member.mg}
 							year={member.year}
 							sub={member.sub}
+							leader={member.leader}
 							on:change={({ detail }) => member = detail}
 							on:remove={() => removeMember(member)}
 						/>

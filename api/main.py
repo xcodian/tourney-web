@@ -21,6 +21,7 @@ class Member(BaseModel):
     mg: int
     year: int
     sub: bool
+    leader: bool
     valid: bool
 
 class Team(BaseModel):

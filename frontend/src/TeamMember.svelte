@@ -8,6 +8,7 @@
     export let discord: string;
     export let ign: string;
     export let sub: boolean;
+    export let leader: boolean;
 
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
@@ -41,7 +42,7 @@
     function onChange() {
         error = validate()
         dispatch('change',
-            { name, year, mg, discord, ign, sub, valid: (error === null) }
+            { name, year, mg, discord, ign, sub, leader, valid: (error === null) }
         );
     }
 
@@ -85,6 +86,12 @@
         <label for="sub">Is Subsititute Player</label>
         <span class="spring" />
         <input type="checkbox" name="sub" placeholder="Substitute" bind:checked={sub} on:change={onChange}>
+    </span>
+
+    <span class="oneline">
+        <label for="leader">Is a Team Leader</label>
+        <span class="spring" />
+        <input type="checkbox" name="leader" placeholder="Leader" bind:checked={leader} on:change={onChange}>
     </span>
 
     {#if error !== null}
