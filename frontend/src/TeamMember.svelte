@@ -15,10 +15,6 @@
     let error: string | null = validate();
     
     function validate() {
-        if (/^[a-zA-Z]+ [a-zA-Z]+ [a-zA-Z]+$/i.test(name)) {
-            return "Only First & Last Name Please"
-        }
-
         if (!(/^[a-zA-Z]+ [a-zA-Z]+$/i.test(name))) {
             return "Full Name Required"
         }
