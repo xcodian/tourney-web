@@ -2,6 +2,8 @@ import asyncio
 from datetime import datetime
 import json
 
+from typing import List
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -23,7 +25,7 @@ class Member(BaseModel):
 
 class Team(BaseModel):
     name: str
-    members: list[Member]
+    members: List[Member]
     
 @app.post("/register")
 async def register(t: Team):
