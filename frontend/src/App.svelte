@@ -9,8 +9,8 @@
 	import { flip } from 'svelte/animate';
 	import { onMount } from "svelte";
 
-	const MAX_NONSUBS = 5;
-	const MIN_NONSUBS = 5;
+	const MAX_NONSUBS = 4;
+	const MIN_NONSUBS = 4;
 	let members = [];
 	let non_subs = [];
 	let name = ""
