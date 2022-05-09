@@ -60,14 +60,19 @@ async def register(t: Team):
         raise HTTPException(status_code=409) # conflict
     
     print(f'{t.name} has registered')
-    teams[t.name] = t.members
+    teams[t.name] = [dict(m) for m in t.members]
+
+    sync_data()
 
 async def save_data_occasionally():
      while True:
          print('[every 30s] writing team data to disk...')
-         with open('teams.json', 'w+') as f:
-            json.dump(teams, f)
+         sync_data()
          await asyncio.sleep(30)
+
+def sync_data():
+    with open('teams.json', 'w+') as f:
+        json.dump(teams, f)
 
 async def main():
     asyncio.create_task(save_data_occasionally())
