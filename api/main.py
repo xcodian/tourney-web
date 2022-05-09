@@ -47,7 +47,7 @@ async def register(t: Team):
             print('rejecting submission: invalid member name, discord, ign or validity flag')
             raise HTTPException(status_code=400)
         
-        if not (0 <= m.mg <= 13):
+        if not (0 <= m.mg <= 14):
             print('rejecting submission: out of range mentor group')
             raise HTTPException(status_code=400)
         

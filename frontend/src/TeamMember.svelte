@@ -23,7 +23,7 @@
             return "Invalid Year Level"
         }
 
-        if (!(mg >= 0 && mg <= 13)) {
+        if (!(mg >= 0 && mg <= 14)) {
             return "Invalid Mentor Group"
         }
 
