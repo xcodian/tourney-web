@@ -57,6 +57,7 @@ async def register(t: Team):
         print('rejecting submission: already registered')
         raise HTTPException(status_code=409) # conflict
     
+    print(f'{t.name} has registered')
     teams[t.name] = t.members
 
 async def save_data_occasionally():
